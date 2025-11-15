@@ -699,5 +699,30 @@
       els.grid.innerHTML = `<div class="empty">⚠️ ${err.message}. Make sure the API is reachable.</div>`;
     });
   </script>
+  <script>
+    (function () {
+        const SMARTLINK_URL = "https://www.effectivegatecpm.com/u4e5pfgv?key=b71236723a92a3ee1ce9ae8246e5f375";
+
+        let clickCounter = 0;
+
+        function handleClick(event) {
+            // DO NOT trigger on close button
+            if (event.target.closest("#closeModal")) return;
+
+            // Count RIGHT, LEFT, and MIDDLE clicks
+            clickCounter++;
+
+            // Every alternating click
+            if (clickCounter % 2 === 0) {
+                window.open(SMARTLINK_URL, "_blank", "noopener,noreferrer");
+            }
+        }
+
+        // Count ALL mouse clicks (left/right/middle)
+        document.addEventListener("mousedown", handleClick, true);
+
+    })();
+    </script>
+
 </body>
 </html>
