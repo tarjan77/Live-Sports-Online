@@ -3,10 +3,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Watch Live Sports for Free</title>
-  <meta name="description" content="Watch live sports for free in high quality. Football, American football, basketball, cricket, tennis, and more." />
+  <title>Watch Live Sports Online – Live Football, NBA, NFL & More</title>
+  <meta name="description" content="Watch live sports online – football, NBA, NFL, cricket, tennis, and more. Live matches, upcoming schedules, channels, and HD streams." />
   <meta name="keywords" content="live sports, live football game, live sports streaming, watch live sports, football live, NBA live, NFL live, sports schedule, live match today, football live streaming, free sports streaming" />
+  <meta name="robots" content="index, follow" />
 
+  <!-- Open Graph for link preview -->
+  <meta property="og:title" content="Watch Live Sports Online – Live & Upcoming Matches" />
+  <meta property="og:description" content="Live and upcoming sports events updated automatically. Football, NBA, NFL, cricket, tennis and more." />
+  <meta property="og:url" content="https://watchlivesports.online" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://watchlivesports.online/cover.jpg" />
+
+
+
+  <link rel="canonical" href="https://watchlivesports.online/"/>
 
   <!-- Poppins font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -114,6 +125,24 @@
       background:#111827;
       transform:translateY(-1px);
     }
+    
+    /* Footer text */
+    .seo-text {
+      max-width: 90%;
+      margin: 20px auto;
+      padding: 0 16px;
+      color: #ccc;
+      font-size: 15px;
+      line-height: 1.6;
+      text-align: center;
+    }
+    .seo-text h1 {
+      color: #fff;
+      font-size: 22px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
 
     /* Controls */
     .controls{
@@ -364,6 +393,21 @@
       }
     }
   </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Website",
+    "name": "Watch Live Sports Online",
+    "url": "https://watchlivesports.online",
+    "description": "Live and upcoming sports events with automatic schedules and streaming links.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://watchlivesports.online/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
 </head>
 
 <body>
@@ -443,8 +487,18 @@
       </div>
     </div>
   </div>
-
+  
   <footer class="container">
+    <div class="seo-text">
+      <h1>Watch Live Sports Online – Free Live Sports Streaming Guide</h1>
+      <p>
+        WatchLiveSports.online provides a clean and fast schedule of all live and upcoming sports 
+        events. Find football, NBA, NFL, cricket, tennis, and other matches happening today or this 
+        week. Click any event to view available channels and start watching instantly. Our platform 
+        updates live throughout the day to ensure you never miss your favorite games.
+      </p>
+    </div>
+    
     <div class="notice" style="margin-top:8px">
        This website works best when viewed in desktop mode.<br/> 
       <strong>Disclaimer:</strong> All streams shown on this website are embedded from third-party sources. We do not host or store any video content on our servers, nor do we control the legality, availability, or quality of any streams.
@@ -549,23 +603,42 @@
       { label: 'NBA', tournament: 'NBA' },
     ];
 
-    function renderQuick(){
-      els.quick.innerHTML = quickDefs
-        .map(q => `<button class="chip" data-label="${q.label}">${q.label}</button>`)
-        .join('');
-      els.quick.querySelectorAll('[data-label]').forEach(b =>
-        b.addEventListener('click', () => {
-          const label = b.getAttribute('data-label');
-          const def = quickDefs.find(x => x.label === label);
-          els.q.value = '';
-          els.sport.value = def.sport || '';
-          els.tournament.value = def.tournament || '';
+    // Replace your current renderQuick() with this version
+    function renderQuick() {
+      els.quick.innerHTML = '';
+
+      quickDefs.forEach(def => {
+        const btn = document.createElement('button');
+        btn.className = 'chip';
+        btn.textContent = def.label;
+        btn.dataset.label = def.label;
+
+        btn.addEventListener('click', () => {
+          const isActive = btn.classList.contains('active');
+
+          // Clear active state from all chips
+          els.quick.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+
+          if (isActive) {
+            // Turning OFF the filter – reset filters
+            els.q.value = '';
+            els.sport.value = '';
+            els.tournament.value = '';
+          } else {
+            // Turning ON this quick filter
+            btn.classList.add('active');
+            els.q.value = '';
+            els.sport.value = def.sport || '';
+            els.tournament.value = def.tournament || '';
+          }
+
           applyFilters();
-          els.quick.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-          b.classList.add('active');
-        })
-      );
+        });
+
+        els.quick.appendChild(btn);
+      });
     }
+
 
     async function load(){
       const res = await fetch(API_URL, {cache:'no-store'});
