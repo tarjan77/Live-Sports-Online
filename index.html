@@ -316,6 +316,53 @@
     .modal .content{flex:1; background:#000}
     .modal iframe{width:100%; height:100%; border:0; display:block}
     .modal .actions{display:flex; gap:8px}
+    
+    /* Hide date tabs on mobile */
+    @media (max-width: 768px) {
+      .date-tabs {
+        display: none !important;
+      }
+
+      header .bar {
+        justify-content: flex-start !important;
+      }
+
+      header .bar .logo {
+        margin-bottom: 0;
+      }
+    }
+    
+    /* Between tablet and desktop: keep logo on one line, make date tabs scroll instead of wrapping */
+    /* Between tablet and desktop – keep logo on one line,
+   make the date tabs scroll instead of squeezing the logo */
+    @media (max-width: 1210px) and (min-width: 769px) {
+      header .bar {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;          /* logo + date tabs stay in one row */
+      }
+
+      .logo {
+        flex: 0 0 auto;             /* don't let logo shrink too much */
+      }
+
+      .logo-sub {
+        white-space: nowrap;        /* ❗ keep "Live & upcoming events" on one line */
+        font-size: 13px;            /* slightly smaller so it fits comfortably */
+      }
+
+      .date-tabs {
+        flex: 1 1 auto;
+        flex-wrap: nowrap;
+        overflow-x: auto;           /* scroll horizontally instead of wrapping */
+        white-space: nowrap;
+        scrollbar-width: none;      /* hide scrollbar in Firefox */
+      }
+
+      .date-tabs::-webkit-scrollbar {
+        display: none;              /* hide scrollbar in Chrome/Edge */
+      }
+    }
   </style>
 </head>
 
@@ -336,7 +383,7 @@
       <div class="controls" role="region" aria-label="Filters">
         <div class="control">
           <span class="label">Search match or team</span>
-          <input id="q" type="search" placeholder="e.g., Lakers, Rangers, NFL..." autocomplete="off" />
+          <input id="q" type="search" placeholder="E.g., Manchester, Florida, NFL..." autocomplete="off" />
         </div>
         <div class="control">
           <span class="label">Sport</span>
