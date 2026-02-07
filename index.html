@@ -34,16 +34,16 @@
         }
         .bar-logo { height: 50px; width: auto; }
 
-        /* Match Boxes - Reduced by 20% */
-        #match-list { display: flex; flex-direction: column; gap: 10px; }
+        /* Match Boxes - 20% Smaller */
+        #match-list { display: flex; flex-direction: column; gap: 8px; }
         .match-card {
             background: white;
             border: 1px solid var(--border);
             border-radius: 8px;
             display: flex;
             align-items: center;
-            padding: 20px 24px; /* Reduced by 20% from previous 25px/30px */
-            min-height: 80px;   /* Reduced by 20% from previous 100px */
+            padding: 16px 20px; /* Reduced by 20% */
+            min-height: 65px;    /* Reduced by 20% */
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -115,11 +115,19 @@
 </div>
 
 <script>
+    // Comprehensive Database for Group Stage Matches
     const matchData = [
-        { id: 3, t1: "India", c1: "in", t2: "USA", c2: "us", time: "2026-02-07T08:30:00Z", finished: true },
-        { id: 4, t1: "New Zealand", c1: "nz", t2: "Afghanistan", c2: "af", time: "2026-02-08T05:30:00Z", finished: false },
-        { id: 5, t1: "England", c1: "gb-eng", t2: "Nepal", c2: "np", time: "2026-02-08T09:30:00Z", finished: false },
-        { id: 6, t1: "Sri Lanka", c1: "lk", t2: "Ireland", c2: "ie", time: "2026-02-08T13:30:00Z", finished: false }
+        { id: 1, t1: "Pakistan", c1: "pk", t2: "Netherlands", c2: "nl", time: "2026-02-07T11:00:00Z" },
+        { id: 2, t1: "West Indies", c1: "xc", t2: "Scotland", c2: "gb-sct", time: "2026-02-07T15:00:00Z" },
+        { id: 3, t1: "India", c1: "in", t2: "USA", c2: "us", time: "2026-02-07T19:00:00Z" },
+        { id: 4, t1: "New Zealand", c1: "nz", t2: "Afghanistan", c2: "af", time: "2026-02-08T11:00:00Z" },
+        { id: 5, t1: "England", c1: "gb-eng", t2: "Nepal", c2: "np", time: "2026-02-08T15:00:00Z" },
+        { id: 6, t1: "Sri Lanka", c1: "lk", t2: "Ireland", c2: "ie", time: "2026-02-08T19:00:00Z" },
+        { id: 7, t1: "Scotland", c1: "gb-sct", t2: "Italy", c2: "it", time: "2026-02-09T11:00:00Z" },
+        { id: 17, t1: "Nepal", c1: "np", t2: "Italy", c2: "it", time: "2026-02-12T15:00:00Z" },
+        { id: 25, t1: "West Indies", c1: "xc", t2: "Nepal", c2: "np", time: "2026-02-15T11:00:00Z" },
+        { id: 27, t1: "India", c1: "in", t2: "Pakistan", c2: "pk", time: "2026-02-15T19:00:00Z" },
+        { id: 33, t1: "Scotland", c1: "gb-sct", t2: "Nepal", c2: "np", time: "2026-02-17T19:00:00Z" }
     ];
 
     const servers = [
@@ -131,43 +139,63 @@
         { n: "Server 6 (Sky NZ)", u: "https://dovkembed.pw/channel/SkySport1%5BNewZealand%5D" }
     ];
 
-    function loadHome() {
+    function updateMatches() {
         const list = document.getElementById('match-list');
         list.innerHTML = '';
         const now = new Date();
-        
+
         matchData.forEach(m => {
             const mStart = new Date(m.time);
-            const isLive = !m.finished && now >= mStart && now <= new Date(mStart.getTime() + 5*3600000);
-            
-            const card = document.createElement('div');
-            card.className = 'match-card';
-            card.onclick = () => openPlayer(m);
-            card.innerHTML = `
-                <div class="team-section">
-                    <div class="team-info"><img src="https://flagcdn.com/w80/${m.c1}.png"> ${m.t1}</div>
-                    <div class="vs-label">VS</div>
-                    <div class="team-info"><img src="https://flagcdn.com/w80/${m.c2}.png"> ${m.t2}</div>
-                </div>
-                <div class="status-section">
-                    <span class="badge ${m.finished ? 'badge-finished' : (isLive ? 'badge-live' : 'badge-upcoming')}">
-                        ${m.finished ? 'FINISHED' : (isLive ? 'LIVE NOW' : 'NOT STARTED')}
-                    </span>
-                    <span class="time-text">${mStart.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
-                </div>
-            `;
-            list.appendChild(card);
+            const diffMs = now - mStart;
+            const diffMinutes = diffMs / (1000 * 60);
+
+            let status = "NOT STARTED";
+            let badgeClass = "badge-upcoming";
+            let shouldDisplay = true;
+
+            // Live Logic: 15 mins before to 4hrs 45mins after
+            if (diffMinutes >= -15 && diffMinutes < 285) {
+                status = "LIVE NOW";
+                badgeClass = "badge-live";
+            } 
+            // Completed Logic: 4hrs 45mins to 5hrs 15mins after
+            else if (diffMinutes >= 285 && diffMinutes < 315) {
+                status = "COMPLETED";
+                badgeClass = "badge-finished";
+            } 
+            // Removal Logic: After 5hrs 15mins
+            else if (diffMinutes >= 315) {
+                shouldDisplay = false; 
+            }
+
+            if (shouldDisplay) {
+                const card = document.createElement('div');
+                card.className = 'match-card';
+                card.onclick = () => openPlayer(m);
+                card.innerHTML = `
+                    <div class="team-section">
+                        <div class="team-info"><img src="https://flagcdn.com/w80/${m.c1}.png"> ${m.t1}</div>
+                        <div class="vs-label">VS</div>
+                        <div class="team-info"><img src="https://flagcdn.com/w80/${m.c2}.png"> ${m.t2}</div>
+                    </div>
+                    <div class="status-section">
+                        <span class="badge ${badgeClass}">${status}</span>
+                        <span class="time-text">${mStart.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                    </div>
+                `;
+                list.appendChild(card);
+            }
         });
     }
 
     function openPlayer(m) {
         document.getElementById('home-view').style.display = 'none';
         document.getElementById('player-page').style.display = 'block';
-        document.getElementById('match-title').innerText = `${m.t1} vs ${m.t2} ${m.finished ? '(Match Replay)' : 'Live Streaming'}`;
+        document.getElementById('match-title').innerText = `${m.t1} vs ${m.t2} Live Streaming`;
         
         document.getElementById('match-seo-text').innerHTML = `
-            <strong>Match Info:</strong> ${m.t1} vs ${m.t2} ICC T20 World Cup 2026. 
-            ${m.finished ? 'Relive the excitement with full highlights and match coverage.' : 'Watch every ball live with our 6 high-speed servers.'}
+            <strong>Viewing Now:</strong> ${m.t1} vs ${m.t2} - ICC T20 World Cup 2026. Catch every ball live with high-speed server options. 
+            Free HD quality streaming for fans in Nepal and worldwide.
         `;
 
         const btnArea = document.getElementById('server-btns');
@@ -197,7 +225,8 @@
         document.getElementById('video-area').innerHTML = '';
     }
 
-    loadHome();
+    updateMatches();
+    setInterval(updateMatches, 60000); 
 </script>
 </body>
 </html>
