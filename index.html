@@ -17,7 +17,6 @@
         .branding { background: white; padding: 20px 15px; text-align: center; border-bottom: 3px solid var(--wicket-blue); margin-bottom: 10px; border-radius: 8px; }
         .branding h1 { margin: 0; font-size: 26px; color: var(--wicket-blue); font-weight: 900; text-transform: uppercase; }
 
-        /* Larger Red Bar with Internal Logo */
         .tournament-bar { 
             background: var(--wicket-red); 
             color: white; 
@@ -34,7 +33,6 @@
         }
         .bar-logo { height: 50px; width: auto; }
 
-        /* Match Boxes - 20% Smaller */
         #match-list { display: flex; flex-direction: column; gap: 8px; }
         .match-card {
             background: white;
@@ -42,8 +40,8 @@
             border-radius: 8px;
             display: flex;
             align-items: center;
-            padding: 16px 20px; /* Reduced by 20% */
-            min-height: 65px;    /* Reduced by 20% */
+            padding: 16px 20px;
+            min-height: 65px;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -65,6 +63,7 @@
             .match-card { padding: 12px; flex-direction: column; text-align: center; min-height: auto; }
             .team-section { width: 100%; margin-bottom: 10px; justify-content: center; }
             .status-section { border-left: none; padding-left: 0; border-top: 1px solid #eee; padding-top: 10px; width: 100%; text-align: center; }
+            .tournament-bar { font-size: 16px; padding: 15px; }
         }
 
         .seo-footer { background: white; padding: 30px; margin-top: 25px; border-radius: 8px; border: 1px solid var(--border); line-height: 1.8; }
@@ -115,7 +114,7 @@
 </div>
 
 <script>
-    // Comprehensive Database for Group Stage Matches
+    // Full database - but only those in 24h window will show
     const matchData = [
         { id: 1, t1: "Pakistan", c1: "pk", t2: "Netherlands", c2: "nl", time: "2026-02-07T11:00:00Z" },
         { id: 2, t1: "West Indies", c1: "xc", t2: "Scotland", c2: "gb-sct", time: "2026-02-07T15:00:00Z" },
@@ -143,6 +142,7 @@
         const list = document.getElementById('match-list');
         list.innerHTML = '';
         const now = new Date();
+        const cutoff = new Date(now.getTime() + (24 * 60 * 60 * 1000));
 
         matchData.forEach(m => {
             const mStart = new Date(m.time);
@@ -151,21 +151,19 @@
 
             let status = "NOT STARTED";
             let badgeClass = "badge-upcoming";
-            let shouldDisplay = true;
+            let shouldDisplay = false;
 
-            // Live Logic: 15 mins before to 4hrs 45mins after
+            // Display logic strictly for matches live now or in next 24h
             if (diffMinutes >= -15 && diffMinutes < 285) {
                 status = "LIVE NOW";
                 badgeClass = "badge-live";
-            } 
-            // Completed Logic: 4hrs 45mins to 5hrs 15mins after
-            else if (diffMinutes >= 285 && diffMinutes < 315) {
+                shouldDisplay = true;
+            } else if (diffMinutes >= 285 && diffMinutes < 315) {
                 status = "COMPLETED";
                 badgeClass = "badge-finished";
-            } 
-            // Removal Logic: After 5hrs 15mins
-            else if (diffMinutes >= 315) {
-                shouldDisplay = false; 
+                shouldDisplay = true;
+            } else if (mStart > now && mStart <= cutoff) {
+                shouldDisplay = true;
             }
 
             if (shouldDisplay) {
